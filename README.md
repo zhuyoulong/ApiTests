@@ -49,27 +49,59 @@
 
 ```
 接口回归测试启动...
+清理测试数据...
 读取配置文件中...
 读取接口数据中...
 接口请求中，请等待...
+http://a-b.test.c.com/api/Circle/AddCancelCollectCircle
+....................................................
+http://a-b.test.c.com/api/GroupActivity/UploadActivityImage
+http://a-b.test.c.com/api/photo/UploadImage
+RequestException url: http://a-b.test.c.com/api/Demand/GetDemandKnockSourceListV4
+HTTPConnectionPool(host='http://a-b.test.c.com', port=80): Read timed out. (read timeout=30)
+IndexError url:
+http://a-b.test.c.com/api/Demand/GetDemandKnockSourceListV4
 接口请求完成！
 发现diff接口，重试机制启动...
-读取配置文件中...
-diff sessions: iscanchatbymulit.txt
-发现录制异常接口：iscanchatbymulit.txt
-执行移除操作，移除重试队列
-diff sessions: GetGroupDynamicCommentList.txt
-发现录制异常接口：GetGroupDynamicCommentList.txt
-执行移除操作，移除重试队列
 第1次尝试请求diff...
+diff sessions: GetDemandKnockSourceListV4.txt
+diff sessions: GetSecondHouseTopic.txt
+http://a-b.test.c.com/api/Demand/GetDemandKnockSourceListV4
+http://a-b.test.c.com/api/SecondHouseSource/GetSecondHouseTopic
+RequestException url: http://a-b.test.c.com/api/Demand/GetDemandKnockSourceListV4
+HTTPConnectionPool(host='http://a-b.test.c.com', port=80): Read timed out. (read timeout=30)
+IndexError url:
+http://a-b.test.c.com/api/Demand/GetDemandKnockSourceListV4
+发现diff存在，继续尝试请求...
+第2次尝试请求diff...
+diff sessions: GetDemandKnockSourceListV4.txt
+http://a-b.test.c.com/api/Demand/GetDemandKnockSourceListV4
+RequestException url: http://a-b.test.c.com/api/Demand/GetDemandKnockSourceListV4
+HTTPConnectionPool(host='http://a-b.test.c.com', port=80): Read timed out. (read timeout=30)
+IndexError url:
+http://a-b.test.c.com/api/Demand/GetDemandKnockSourceListV4
+发现diff存在，继续尝试请求...
+第3次尝试请求diff...
+diff sessions: GetDemandKnockSourceListV4.txt
+http://a-b.test.c.com/api/Demand/GetDemandKnockSourceListV4
+RequestException url: http://a-b.test.c.com/api/Demand/GetDemandKnockSourceListV4
+HTTPConnectionPool(host='http://a-b.test.c.com', port=80): Read timed out. (read timeout=30)
+IndexError url:
+http://a-b.test.c.com/api/Demand/GetDemandKnockSourceListV4
 diff请求完成...
 正在整理创建的数据...
 清理创建的接口数据...
-读取配置文件中...
+http://a-b.test.c.com/api/Circle/DeleteContent
+http://a-b.test.c.com/api/Group/DeleteAnnouncement
+http://a-b.test.c.com/api/RentDemand/DeleteRentDemandById
+http://a-b.test.c.com/api/GroupFile/DeleteGroupFile
+http://a-b.test.c.com/api/GroupDynamic/DeleteGroupDynamic
+http://a-b.test.c.com/api/Demand/DeleteDemandById
+http://a-b.test.c.com/api/GroupActivity/DeleteGroupActivity
 接口数据清理完成！
 测试报告准备中...
 接口回归测试完成！
-耗时： 21s
+耗时： 125s
 ```
 
 #### 请求接口后写入本地的数据说明
