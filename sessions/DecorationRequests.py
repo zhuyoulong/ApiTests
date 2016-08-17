@@ -29,9 +29,8 @@ class DecorationRequests(base.Request.Request):
         read = sessions.ReadConf.ReadConf(utils.GlobalList.DECORATION_CONF_PATH)
         utils.GlobalList.CURRENT_CONF_PATH = utils.GlobalList.DECORATION_CONF_PATH
         self.conf = read.get_conf()
-        self.AUTHORIZATION = "Digest t=\"%s\",SystemType=\"2\",u=\"%s\",r=\"%s\",DevicesId=\"%s\",DeviceId=\"470201315988652\",Model=\"%s\",DeviceOS=\"%s\",Release=\"%s\",VersionName=\"%s\",VersionCode=\"%s\",PushToken=\"\"," \
-                             "UserId=\"%s\",UserName=\"%s\",SessionId=\"%s\",bDChannelId=\"%s\",bDUserId=\"%s\",AppBuild=\"%s\""
-        self.AUTHORIZATION_TOKEN = "Digest u=\"ABC\",r=\"%s\",SystemType=\"%s\",Model=\"%s\",Release=\"%s\",DevicesId=\"%s\",DeviceId=\"470201315988652\",VersionCode=\"%s\",VersionName=\"%s\",AppBuild=\"%s\",PushToken=\"\",DeviceOS=\"%s\""
+        self.AUTHORIZATION = ""
+        self.AUTHORIZATION_TOKEN = ""
         self.__get_token_header()
         self.__login_session()
         self.sessions = ()
@@ -46,7 +45,7 @@ class DecorationRequests(base.Request.Request):
                self.conf['versionCode'], self.conf['versionName'], self.conf['AppBuild'], self.conf['DeviceOS'])
         authorization = self.AUTHORIZATION_TOKEN % arr
         headers = {'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8', 'Authorization': authorization}
-        response = self.session.post(self.conf['getTokenHost'], headers=headers, data='IsGetAd=true')
+        response = self.session.post(self.conf['getTokenHost'], headers=headers, data='')
         data1 = json.loads(response.text)
         if data1['status'] == 200:
             self.time = data1['time']

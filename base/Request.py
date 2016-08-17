@@ -53,7 +53,7 @@ class Request(object):
         初始化
         """
         self.thread_count = thread_count
-        self.AUTHORIZATION_IMAGE_UPLOAD = "Digest u=\"A\", r=\"6Fef07d7dc9ac7T5474775e8d24ee293\""
+        self.AUTHORIZATION_IMAGE_UPLOAD = ""
         self.session = requests.session()
         self.TOKEN_NAME = ""
         self.TOKEN_VALUE = ""
@@ -82,7 +82,7 @@ class Request(object):
         :return:
         """
         date = utils.TimeUtil.timestamp(self.format_time)
-        temp = "%s%s%s%s%s" % (self.TOKEN_NAME, date, "BCA", method_name, self.TOKEN_VALUE)
+        temp = "%s%s%s%s%s" % (self.TOKEN_NAME, date, "", method_name, self.TOKEN_VALUE)
         m = hashlib.md5()
         m.update(temp.encode())
         return m.hexdigest(), date

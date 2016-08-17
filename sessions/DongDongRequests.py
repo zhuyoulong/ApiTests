@@ -32,8 +32,8 @@ class DongDongRequests(base.Request.Request):
         utils.GlobalList.CURRENT_CONF_PATH = d.split("|")[0]
         read = sessions.ReadConf.ReadConf(d.split("|")[0])
         self.conf = read.get_conf()
-        self.AUTHORIZATION = "Digest t=\"%s\",SystemType=\"2\",u=\"%s\",r=\"%s\",DeviceId=\"%s\",Model=\"%s\",DeviceOS=\"%s\",Release=\"%s\",VersionName=\"%s\",VersionCode=\"%s\",PushToken=\"\",uId=\"%s\",uName=\"%s\",uPhone=\"%s\",SessionId=\"%s\",uType=\"%s\",bDChannelId=\"%s\",bDUserId=\"%s\",AppBuild=\"%s\",uUID=\"%s\""
-        self.AUTHORIZATION_TOKEN = "Digest u=\"DFG\",r=\"%s\",SystemType=\"%s\",Model=\"%s\",Release=\"%s\",DeviceId=\"%s\",VersionCode=\"%s\",VersionName=\"%s\",AppBuild=\"%s\",PushToken=\"\",DeviceOS=\"%s\",uUID=\"%s\""
+        self.AUTHORIZATION = ""
+        self.AUTHORIZATION_TOKEN = ""
         self.head_uid = d.split("|")[-1]
         self.uuid = "0"
         self.__get_token_header()

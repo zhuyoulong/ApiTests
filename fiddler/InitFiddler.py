@@ -16,13 +16,5 @@ def create_folder(l1):
 
 
 if __name__ == "__main__":
-    l = ['D:\\Fiddler Sessions', 'D:\\Fiddler Sessions\\Api', 'D:\\Fiddler Sessions\\Api\\A-webapi.test.B.com',
-         'D:\\Fiddler Sessions\\Api\\A-webapi.test.B.com',
-         'D:\\Fiddler Sessions\\Api\\A-webapi.B.com',
-         'D:\\Fiddler Sessions\\Api\\A-webapi.test.B.com',
-         'D:\\Fiddler Sessions\\Api\\A-webapi.test.B.com',
-         'D:\\Fiddler Sessions\\Api\\A-webapi.B.com', 'D:\\Fiddler Sessions\\Api\\A.bbs.B.com',
-         'D:\\Fiddler Sessions\\Api\\A.bbs.B.com',
-         'D:\\Fiddler Sessions\\Api\\A-webapitestv2.outside.B.com',
-         'D:\\Fiddler Sessions\\Api\\A-webapiv2.outside.B.com']
+    l = []
     create_folder(l)

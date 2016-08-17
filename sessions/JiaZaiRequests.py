@@ -29,13 +29,8 @@ class JiaZaiRequests(base.Request.Request):
         read = sessions.ReadConf.ReadConf(utils.GlobalList.JIAZAI_CONF_PATH)
         utils.GlobalList.CURRENT_CONF_PATH = utils.GlobalList.JIAZAI_CONF_PATH
         self.conf = read.get_conf()
-        self.AUTHORIZATION = "Digest t=\"%s\",SystemType=\"2\",u=\"%s\",r=\"%s\"," \
-                             "DeviceId=\"%s\",Model=\"%s\",DeviceOS=\"%s\",Release=\"%s\",VersionName=\"%s\",VersionCode=\"%s\"," \
-                             "PushToken=\"\",uId=\"%s\",uName=\"%s\",uPhone=\"%s\",SessionId=\"%s\",uType=\"%s\",bDChannelId=\"%s\"," \
-                             "bDUserId=\"%s\",AppBuild=\"%s\",miPush=\"%s\""""
-        self.AUTHORIZATION_TOKEN = "Digest u=\"KJH\",r=\"%s\",SystemType=\"%s\",Model=\"%s\"," \
-                                   "Release=\"%s\",DeviceId=\"%s\",VersionCode=\"%s\",VersionName=\"%s\",AppBuild=\"%s\",PushToken=\"\"," \
-                                   "DeviceOS=\"%s\""
+        self.AUTHORIZATION = ""
+        self.AUTHORIZATION_TOKEN = ""
         self.__get_token_header()
         self.__login_session()
         self.sessions = ()

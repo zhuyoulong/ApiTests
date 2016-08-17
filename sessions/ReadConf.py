@@ -16,10 +16,7 @@ import utils.GlobalList
 class ReadConf(object):
     def __init__(self, conf_path):
         self.conf_path = conf_path
-        self.conf = {'tester': '', 'project': '', 'versionName': '', 'versionCode': '', 'AppBuild': '', 'host': '',
-                     'systemType': '2', 'DeviceId': 'ffffffff-b3f1-87ad-90ef-ebeb00000000', 'Model': 'MI+4LTE',
-                     'DeviceOS': '23', 'Release': '6.0.1', 'getTokenHost': '', 'loginHost': '', 'loginInfo': '',
-                     'SessionsPath': '', 'ApiURL': '', 'SpecialSessions': '', 'SessionsPair': ''}
+        self.conf = {}
 
     def get_conf(self):
         print('读取配置文件中...')
