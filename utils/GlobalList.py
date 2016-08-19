@@ -10,10 +10,10 @@
 
 import os
 
-CONF_PATH = '%s%s' % (os.getcwd()[::-1].split('\\', 1)[-1][::-1], '\\ApiText.conf')
-BROKER_CONF_PATH = '%s%s' % (os.getcwd()[::-1].split('\\', 1)[-1][::-1], '\\ApiTextBroker.conf')
-JIAZAI_CONF_PATH = '%s%s' % (os.getcwd()[::-1].split('\\', 1)[-1][::-1], '\\ApiTextJiaZai.conf')
-DECORATION_CONF_PATH = '%s%s' % (os.getcwd()[::-1].split('\\', 1)[-1][::-1], '\\ApiTextDecoration.conf')
+CONF_PATH = os.path.join(os.path.expanduser('~'), 'ApiText.conf')
+BROKER_CONF_PATH = os.path.join(os.path.expanduser('~'), 'ApiTextBroker.conf')
+JIAZAI_CONF_PATH = os.path.join(os.path.expanduser('~'), 'ApiTextJiaZai.conf')
+DECORATION_CONF_PATH = os.path.join(os.path.expanduser('~'), 'ApiTextDecoration.conf')
 CURRENT_CONF_PATH = ''
 CONF = {}
 ZIP_NAME = ''
