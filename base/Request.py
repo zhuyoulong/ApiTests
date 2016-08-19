@@ -148,21 +148,22 @@ class Request(object):
                 '%s%s' % ("Request body: ", data1), '%s%s' % ("Response code: ", response.status_code),
                 '%s%s' % ("Response body: ", response.text)], response.text, json_dict, json_body)
 
-    def start_thread_pool(self, thread_pool, app_type):
+    def start_thread_pool(self, thread_pool1, app_type):
         """
         开始请求接口
-        :param thread_pool: 线程池
+        :param thread_pool1: 线程池
         :param app_type: 0 >> A; 1 >> B; 2 >> C; 3 >> D
         :return:
         """
         d1 = datetime.datetime.now()
-        print("读取接口数据中...")
         s = sessions.ReadSessions.ReadSessions()
+        print("读取接口数据中...")
+        s.check_create_sessions()
         l = s.get_will_request_sessions()  # 获取将要请求的所有接口数据
         print("接口请求中，请等待...")
 
         pool = threadpool.ThreadPool(self.thread_count)
-        requests1 = threadpool.makeRequests(thread_pool, l)
+        requests1 = threadpool.makeRequests(thread_pool1, l)
         [pool.putRequest(req) for req in requests1]
         pool.wait()
         print("接口请求完成！")
@@ -172,7 +173,7 @@ class Request(object):
 
         # 清理数据
         print("正在整理创建的数据...")
-        sessions.DelaySessions.clear_up(0)
+        sessions.DelaySessions.clear_up(app_type)
         print("测试报告准备中...")
         d2 = datetime.datetime.now()
         t = d2 - d1

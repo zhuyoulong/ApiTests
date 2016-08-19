@@ -102,6 +102,7 @@ class JiaZaiRequests(base.Request.Request):
         if self.sessions[0] != 200:
             sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, self.sessions[1],
                                                   "ErrorResponse")
+            return
         if not diff:
             self.__un_diff_verify_write()
         elif 0.8 < difflib.SequenceMatcher(None, expect_json_list, result_json_list).ratio() < 1.0:

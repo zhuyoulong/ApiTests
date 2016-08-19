@@ -21,11 +21,7 @@ class ReadConf(object):
     def get_conf(self):
         print('读取配置文件中...')
         if not os.path.exists(self.conf_path):
-            print("请确保配置文件存在！")
-            return
-        if not self.conf_path.endswith('.conf'):
-            print("请确保该文件是配置文件！")
-            return
+            raise FileNotFoundError("请确保配置文件存在！")
         l = open(self.conf_path, encoding='utf-8').readlines()
         for i in l:
             if i.startswith('tester'):

@@ -36,11 +36,25 @@ class ReadSessions(object):
 
             # 移除录制异常的接口，即无数据的接口，否则重试时会计算进去
             file_path = '%s%s%s' % (self.sessions_path, '\\', i)
-            try:
-                if os.path.getsize(file_path) < 100:
-                    os.remove(file_path)
-            except FileNotFoundError:
-                print('%s%s' % (i, '文件不存在'))
+            if os.path.exists(file_path) and os.path.getsize(file_path) < 100:
+                print('无效文件，执行删除：%s' % (i,))
+                os.remove(file_path)
+
+    def check_create_sessions(self):
+        """
+        检查是否存在对应的创建数据接口
+        数据对应配置文件的SessionsPair
+        :return:
+        """
+        for s in utils.GlobalList.CREATE_DICT.keys():
+            file_path = '%s\\%s.txt' % (self.sessions_path, s)
+            if not os.path.exists(file_path):
+                raise FileNotFoundError('%s接口未录制，接口回归测试退出' % (s, ))
+
+        for s in utils.GlobalList.DELETE_DICT.keys():
+            file_path = '%s\\%s.txt' % (self.sessions_path, s)
+            if not os.path.exists(file_path):
+                raise FileNotFoundError('%s接口未录制，接口回归测试退出' % (s, ))
 
     def __ignore_sessions(self):
         """
@@ -50,7 +64,7 @@ class ReadSessions(object):
         self.__remove_special_files()
         files = list(utils.FileUtil.get_file_list(self.sessions_path))
         for s in utils.GlobalList.DELETE_DICT.keys():
-            file_path = '%s%s' % (s, '.txt')
+            file_path = '%s.txt' % (s, )
             if file_path in files:
                 files.remove(file_path)
         return files
@@ -117,6 +131,7 @@ class ReadSessions(object):
         sessions = self.__get_all_session()
         for i in sessions:
             for j in i:
+                utils.GlobalList.TOTAL_SESSIONS += 1  # 请求的总接口数量
                 yield j
 
 

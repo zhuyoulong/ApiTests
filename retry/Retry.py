@@ -142,9 +142,7 @@ class Retry(object):
         :return:
         """
         s = self.__get_diff_sessions()
-        for i in s:
-            for j in i:
-                yield j
+        return (j for i in s for j in i)
 
     def __request_sessions(self, app_type):
         """
@@ -167,15 +165,17 @@ class Retry(object):
         while self.retry > 0:
             self.retry -= 1
             # 请求接口
+            print('第%d次尝试请求diff...' % (temp - self.retry,))
             self.__request_sessions(app_type)
-            print('第%d次尝试请求diff...' % (temp - self.retry, ))
             # 再次求差异化文件，还有diff继续，否则停止
             if len(self.get_diff()) > 0 and self.retry > 0:
                 print('发现diff存在，继续尝试请求...')
                 continue
             else:
                 break
-        print('diff请求完成...')
+        print('diff机制退出...')
+        # 重试机制完成，再对比一次数据，用于生成报告
+        self.get_diff()
 
 
 if __name__ == "__main__":
