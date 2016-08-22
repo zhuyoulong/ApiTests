@@ -13,28 +13,21 @@ import json
 import urllib.request
 
 import base.Request
-import sessions.ReadConf
 import sessions.WriteSessions
 import utils.GlobalList
 import utils.HandleJson
+import utils.ApiException
 
 
 class DongDongRequests(base.Request.Request):
-    def __init__(self, dd_type):
+    def __init__(self):
         """
         初始化
-        :param dd_type: 0 >> A; 1 >> B
         """
-        self.dd_type = dd_type
         super(DongDongRequests, self).__init__()
-        # 读取配置文件
-        d = utils.GlobalList.get_dd_type(self.dd_type)
-        utils.GlobalList.CURRENT_CONF_PATH = d.split("|")[0]
-        read = sessions.ReadConf.ReadConf(d.split("|")[0])
-        self.conf = read.get_conf()
+        self.conf = utils.GlobalList.CONF
         self.AUTHORIZATION = ""
         self.AUTHORIZATION_TOKEN = ""
-        self.head_uid = d.split("|")[-1]
         self.uuid = "0"
         self.__get_token_header()
         self.__login_session()
@@ -60,8 +53,8 @@ class DongDongRequests(base.Request.Request):
             self.TOKEN_NAME = data1['TokenName']
             self.TOKEN_VALUE = data1['TokenValue']
         else:
-            print("GetToken失败，请手动检查")
             utils.HandleJson.HandleJson.print_json(response.text)
+            raise utils.ApiException.TokenException("GetToken失败，请手动检查！")
 
     def __login_session(self):
         """
@@ -74,15 +67,18 @@ class DongDongRequests(base.Request.Request):
         response = self.session.post(url_login, headers=headers, data=data_login)
         if json.loads(response.text)['StatsCode'] == 200:
             data1 = json.loads(response.text)['Data']
-            self.uId = data1[self.head_uid]
+            try:
+                self.uId = data1['UserId']
+            except KeyError:
+                self.uId = data1['UserID']
             self.uName = data1['NickName']
             self.uPhone = data1['Phone']
             self.SessionId = data1['Sid']
             self.uType = data1['UserType']
             self.uuid = data1['UID']
         else:
-            print("登录失败，请手动检查")
             utils.HandleJson.HandleJson.print_json(response.text)
+            raise utils.ApiException.LoginException("登录失败，请手动检查！")
 
     def __get_session_header(self, method_name):
         """
@@ -170,8 +166,8 @@ class DongDongRequests(base.Request.Request):
             print('%s%s' % ('IndexError url:\n', l[0]))
 
     def start(self):
-        self.start_thread_pool(self.thread_pool, self.dd_type)
+        self.start_thread_pool(self.thread_pool, 1)
 
 if __name__ == '__main__':
-    dd = DongDongRequests(0)
+    dd = DongDongRequests()
     dd.start()

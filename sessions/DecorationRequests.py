@@ -13,10 +13,10 @@ import json
 import urllib.request
 
 import base.Request
-import sessions.ReadConf
 import sessions.WriteSessions
 import utils.GlobalList
 import utils.HandleJson
+import utils.ApiException
 
 
 class DecorationRequests(base.Request.Request):
@@ -25,10 +25,7 @@ class DecorationRequests(base.Request.Request):
         初始化
         """
         super(DecorationRequests, self).__init__()
-        # 读取配置文件
-        read = sessions.ReadConf.ReadConf(utils.GlobalList.DECORATION_CONF_PATH)
-        utils.GlobalList.CURRENT_CONF_PATH = utils.GlobalList.DECORATION_CONF_PATH
-        self.conf = read.get_conf()
+        self.conf = self.conf = utils.GlobalList.CONF
         self.AUTHORIZATION = ""
         self.AUTHORIZATION_TOKEN = ""
         self.__get_token_header()
@@ -52,8 +49,8 @@ class DecorationRequests(base.Request.Request):
             self.TOKEN_NAME = data1['tokenName']
             self.TOKEN_VALUE = data1['tokenValue']
         else:
-            print("GetToken失败，请手动检查")
             utils.HandleJson.HandleJson.print_json(response.text)
+            raise utils.ApiException.TokenException("GetToken失败，请手动检查！")
 
     def __login_session(self):
         """
@@ -70,8 +67,8 @@ class DecorationRequests(base.Request.Request):
             self.uName = data1['userName']
             self.SessionId = data1['sessionId']
         else:
-            print("登录失败，请手动检查")
             utils.HandleJson.HandleJson.print_json(response.text)
+            raise utils.ApiException.LoginException("登录失败，请手动检查！")
 
     def __get_session_header(self, method_name):
         """

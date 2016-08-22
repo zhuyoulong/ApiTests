@@ -21,7 +21,6 @@ import os
 import re
 
 import base.Request
-import sessions.ReadConf
 import sessions.ReadSessions
 import utils.FileUtil
 import utils.GlobalList

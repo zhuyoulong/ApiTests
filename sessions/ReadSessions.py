@@ -13,6 +13,7 @@ import os
 import utils.FileUtil
 import utils.GlobalList
 import utils.HandleJson
+import utils.ApiException
 
 
 class ReadSessions(object):
@@ -49,12 +50,12 @@ class ReadSessions(object):
         for s in utils.GlobalList.CREATE_DICT.keys():
             file_path = '%s\\%s.txt' % (self.sessions_path, s)
             if not os.path.exists(file_path):
-                raise FileNotFoundError('%s接口未录制，接口回归测试退出' % (s, ))
+                raise utils.ApiException.ApiNotRecorded('%s接口未录制，接口回归测试退出' % (s,))
 
         for s in utils.GlobalList.DELETE_DICT.keys():
             file_path = '%s\\%s.txt' % (self.sessions_path, s)
             if not os.path.exists(file_path):
-                raise FileNotFoundError('%s接口未录制，接口回归测试退出' % (s, ))
+                raise utils.ApiException.ApiNotRecorded('%s接口未录制，接口回归测试退出' % (s,))
 
     def __ignore_sessions(self):
         """

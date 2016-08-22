@@ -31,12 +31,9 @@ def thread_pool(app_type, sessions1):
     """
     requests1 = []
     pool = threadpool.ThreadPool(8)
-    if app_type == 0:
+    if app_type == 1:
         import sessions.DongDongRequests
-        requests1 = threadpool.makeRequests(sessions.DongDongRequests.DongDongRequests(0).thread_pool, sessions1)
-    elif app_type == 1:
-        import sessions.DongDongRequests
-        requests1 = threadpool.makeRequests(sessions.DongDongRequests.DongDongRequests(1).thread_pool, sessions1)
+        requests1 = threadpool.makeRequests(sessions.DongDongRequests.DongDongRequests().thread_pool, sessions1)
     elif app_type == 2:
         import sessions.JiaZaiRequests
         requests1 = threadpool.makeRequests(sessions.JiaZaiRequests.JiaZaiRequests().thread_pool, sessions1)

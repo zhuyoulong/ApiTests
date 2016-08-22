@@ -8,12 +8,6 @@
 接口全局文件
 """
 
-import os
-
-CONF_PATH = os.path.join(os.path.expanduser('~'), 'ApiText.conf')
-BROKER_CONF_PATH = os.path.join(os.path.expanduser('~'), 'ApiTextBroker.conf')
-JIAZAI_CONF_PATH = os.path.join(os.path.expanduser('~'), 'ApiTextJiaZai.conf')
-DECORATION_CONF_PATH = os.path.join(os.path.expanduser('~'), 'ApiTextDecoration.conf')
 CURRENT_CONF_PATH = ''
 CONF = {}
 ZIP_NAME = ''
@@ -27,17 +21,3 @@ DELETE_DICT = {}  # 删除接口字典 key >> 接口名 value >> 请求字段id
 MAPPING_DICT = {}  # 映射字典，即删除数据接口对应的创建数据接口
 HOST = ''
 BEFORE_SESSIONS = []  # 遍历前的全部接口，即ReadSessions读取的接口
-
-
-def get_dd_type(dd_type):
-    """
-    返回app类型
-    :param dd_type: 0 >> A; 1 >> B
-    :return:
-    """
-    d = {0: '%s%s%s' % (CONF_PATH, '|', 'UserId'), 1: '%s%s%s' % (BROKER_CONF_PATH, '|', 'UserID')}
-    return d[dd_type]
-
-
-if __name__ == "__main__":
-    print(get_dd_type(1))
