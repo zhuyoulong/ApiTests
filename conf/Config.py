@@ -18,13 +18,34 @@ class Config(object):
         self.config = configparser.ConfigParser()
         self.conf_path = os.path.join(os.getcwd()[::-1].split('\\', 1)[-1][::-1], 'conf', 'config.conf')
         if not os.path.exists(self.conf_path):
-            raise FileNotFoundError("请确保配置文件存在！")
+            # 持续集成时配置文件目录有改变，需要兼容
+            self.conf_path = os.path.join(os.path.dirname(
+                os.path.abspath(__file__)[::-1].split('\\', 1)[-1][::-1]), 'conf', 'config.conf')
+            if not os.path.exists(self.conf_path):
+                raise FileNotFoundError("请确保配置文件存在！")
         self.config.read(self.conf_path, encoding='utf-8')
         self.type = api_type
-        self.conf = {'tester': '', 'project': '', 'versionName': '', 'versionCode': '', 'AppBuild': '', 'host': '',
-                     'systemType': '2', 'DeviceId': 'ffffffff-b3f1-87ad-90ef-ebeb00000000', 'Model': 'MI+4LTE',
-                     'DeviceOS': '23', 'Release': '6.0.1', 'getTokenHost': '', 'loginHost': '', 'loginInfo': '',
-                     'SessionsPath': '', 'ApiURL': '', 'SpecialSessions': '', 'SessionsPair': ''}
+        self.conf = {
+            'tester': '',
+            'project': '',
+            'versionName': '',
+            'versionCode': '',
+            'AppBuild': '',
+            'host': '',
+            'systemType': '2',
+            'DeviceId': 'ffffffff-b3f1-87ad-90ef-ebeb00000000',
+            'Model': 'MI+4LTE',
+            'DeviceOS': '23',
+            'Release': '6.0.1',
+            'getTokenHost': '',
+            'loginHost': '',
+            'loginInfo': '',
+            'SessionsPath': '',
+            'ApiURL': '',
+            'SpecialSessions': '',
+            'SessionsPair': ''
+        }
+
         self.__get_conf()
 
     def __get_conf(self):
@@ -63,6 +84,7 @@ class Config(object):
             utils.GlobalList.CREATE_DICT[session_create_name] = session_create_parameter
             utils.GlobalList.DELETE_DICT[session_delete_name] = session_delete_parameter
             utils.GlobalList.MAPPING_DICT[session_delete_name] = session_create_name
+
 
 if __name__ == '__main__':
     Config(0)

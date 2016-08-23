@@ -96,7 +96,8 @@ class DecorationRequests(base.Request.Request):
         diff = list(set(expect_json_list) ^ (set(result_json_list)))  # 求差集
 
         if self.sessions[0] != 200:
-            sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, self.sessions[1], "ErrorResponse")
+            sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, self.sessions[1],
+                                                  "ErrorResponse")
             return
         if not diff:
             self.__un_diff_verify_write()
@@ -118,9 +119,9 @@ class DecorationRequests(base.Request.Request):
         没有差异化以及差异化太大时的验证
         :return:
         """
-        status = json.loads(self.sessions[-1])['status']
+        status = json.loads(self.sessions[-3])['status']
         if status != 200:
-            if json.loads(self.sessions[-1])['msg'].find("异常") != -1:
+            if json.loads(self.sessions[-3])['msg'].find("异常") != -1:
                 sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, self.sessions[1],
                                                       "ProgramCrash")
             else:
@@ -153,7 +154,7 @@ class DecorationRequests(base.Request.Request):
         try:
             self.post(l[0], l[0].split("api/")[-1], l[2], l[-1], l[1])
         except IndexError:
-            print('%s%s' % ('IndexError url:\n', l[0]))
+            print('IndexError url:\n%s' % (l[0], ))
 
     def start(self):
         self.start_thread_pool(self.thread_pool, 3)

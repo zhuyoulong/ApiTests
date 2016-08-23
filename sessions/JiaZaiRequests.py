@@ -120,9 +120,9 @@ class JiaZaiRequests(base.Request.Request):
         没有差异化以及差异化太大时的验证
         :return:
         """
-        status = json.loads(self.sessions[-1])['Status']
+        status = json.loads(self.sessions[-3])['Status']
         if status != 1 and status != -1 and status != 200:
-            if json.loads(self.sessions[-1])['Message'].find("异常") != -1:
+            if json.loads(self.sessions[-3])['Message'].find("异常") != -1:
                 sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, self.sessions[1],
                                                       "ProgramCrash")
             else:

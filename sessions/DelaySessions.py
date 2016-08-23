@@ -38,8 +38,8 @@ def clear_up(app_type):
 
 class DelaySessions(object):
     def __init__(self):
-        self.create_session_path = '%s%s%s%s' % (utils.GlobalList.SESSIONS_PATH, "\\Sessions\\", utils.GlobalList.HOST, "\\")
-        self.delete_session_path = '%s%s%s%s' % (utils.GlobalList.SESSIONS_PATH, "\\Api\\", utils.GlobalList.HOST, "\\")
+        self.create_session_path = '%s\\Sessions\\%s\\' % (utils.GlobalList.SESSIONS_PATH, utils.GlobalList.HOST)
+        self.delete_session_path = '%s\\Api\\%s\\' % (utils.GlobalList.SESSIONS_PATH, utils.GlobalList.HOST)
         self.create_sessions_parameter_value = self.__get_all_session_create_parameter()
 
     def __get_single_session_create_parameter(self, session_name):
@@ -49,13 +49,17 @@ class DelaySessions(object):
         """
         total_session = []
         parameter = []
-        file_path = '%s%s%s' % (self.create_session_path, session_name, '.txt')
+        file_path = '%s%s.txt' % (self.create_session_path, session_name)
         if os.path.exists(file_path):
             total_session = sessions.ReadSessions.ReadSessions().get_single_session_full_path(
-                '%s%s%s' % (self.create_session_path, session_name, '.txt'))
-        req = re.compile(r'"%s":[0-9]+' % (utils.GlobalList.CREATE_DICT[session_name], ))
+                '%s%s.txt' % (self.create_session_path, session_name))
+        req = re.compile(r'"%s":(.+?)[,}]' % (utils.GlobalList.CREATE_DICT[session_name],))
         for i in total_session:
-            parameter.append(re.findall(req, i[-1])[0].split(":")[-1])
+            match = re.findall(req, i[-1])
+            if len(match) > 0:
+                parameter.append(match[0].split(":")[-1].replace(r'"', ""))
+            else:
+                print('未匹配到关键字\n%s' % (i,))
         return parameter
 
     def __get_all_session_create_parameter(self):
@@ -75,13 +79,17 @@ class DelaySessions(object):
         """
         total_session = []
         delete_session_name = utils.GlobalList.DELETE_DICT[session_name]
-        file_path = '%s%s%s' % (self.delete_session_path, session_name, '.txt')
+        file_path = '%s%s.txt' % (self.delete_session_path, session_name)
         if os.path.exists(file_path):
             total_session = sessions.ReadSessions.ReadSessions().get_single_session_full_path(file_path)
-        req = re.compile(r'%s=[0-9]+' % (delete_session_name, ))
+        req = re.compile(r'%s=(.+?)&' % (delete_session_name,))  # 多字段情况
+        req1 = re.compile(r'%s=(.+?)$' % (delete_session_name,))  # 单字段情况
         for i in total_session:
             if len(i) == 4:
-                temp = re.findall(req, i[1])[0].split('=')[-1]
+                match = re.findall(req, i[1])
+                if len(match) == 0:
+                    match = re.findall(req1, i[1])
+                temp = match[0].split('=')[-1]
                 for j in utils.GlobalList.MAPPING_DICT.keys():
                     if j == session_name:
                         # 匹配对应的创建数据接口
