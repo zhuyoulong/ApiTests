@@ -104,15 +104,15 @@ class Retry(object):
         unexpected_after_sessions = self.__get_unexpected_after_sessions()
         field_change_after_sessions = self.__get_field_change_after_sessions()
         crash_after_sessions = self.__get_crash_after_sessions()
-        if str(type(normal_after_sessions)) != "<class 'NoneType'>":
+        if normal_after_sessions is not None:
             after_sessions.extend(normal_after_sessions)
-        if str(type(not_normal_after_sessions)) != "<class 'NoneType'>":
+        if not_normal_after_sessions is not None:
             after_sessions.extend(not_normal_after_sessions)
-        if str(type(crash_after_sessions)) != "<class 'NoneType'>":
+        if crash_after_sessions is not None:
             after_sessions.extend(crash_after_sessions)
-        if str(type(unexpected_after_sessions)) != "<class 'NoneType'>":
+        if unexpected_after_sessions is not None:
             after_sessions.extend(unexpected_after_sessions)
-        if str(type(field_change_after_sessions)) != "<class 'NoneType'>":
+        if field_change_after_sessions is not None:
             after_sessions.extend(field_change_after_sessions)
         return list(set(before_sessions).difference(set(after_sessions)))
 

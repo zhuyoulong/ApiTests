@@ -14,11 +14,14 @@ import hashlib
 import requests
 import threadpool
 
+import report.SaveSessions
+import report.SendEmail
 import retry.Retry
 import sessions.DelaySessions
 import sessions.ReadSessions
 import sessions.WriteSessions
 import utils.CodeUtil
+import utils.HandleJson
 import utils.TimeUtil
 
 
@@ -84,7 +87,8 @@ class Request(object):
         m.update(temp.encode())
         return m.hexdigest(), date
 
-    def diff_verify_write(self, sessions1, expect_json_body, expect_json_list, result_json_body, result_json_list, diff, session_name):
+    def diff_verify_write(self, sessions1, expect_json_body, expect_json_list, result_json_body, result_json_list, diff,
+                          session_name):
         """
         主要用于差异化写入文件
         :param sessions1: 请求返回的session
@@ -103,6 +107,26 @@ class Request(object):
         sessions1.append('Diff: %s' % (diff,))
         sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, sessions1, session_name)
 
+    def timestamp__compare(self, sessions2):
+        """
+        time参数时间戳长度对比，不一致则存入TimestampCompare文件
+        :return:
+        """
+        result_param_length = utils.HandleJson.HandleJson().is_time_param(sessions2[-3])
+        expect_param_length = utils.HandleJson.HandleJson().is_time_param(sessions2[-1])
+        if len(result_param_length) > 0 and len(expect_param_length) > 0:
+            diff = list(set(result_param_length) ^ set(expect_param_length))
+            if diff:
+                sessions2[1].append('Expect json body: %s' % (sessions2[-1],))
+                sessions2[1].append('Result json body: %s' % (sessions2[-3],))
+                sessions2[1].append('Timestamp diff length: %s' % (diff,))
+                sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, sessions2[1],
+                                                      "TimestampCompare")
+            else:
+                sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, sessions2[1], "")
+        else:
+            sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, sessions2[1], "")
+
     def post_session(self, url1, headers, json_dict, json_body, data1=None):
         """
         发送请求并简单校验response，再写入文件
@@ -114,7 +138,7 @@ class Request(object):
         :return:
         """
         if not url1.startswith("http://"):
-            url1 = '%s%s' % ("http://", url1)
+            url1 = 'http://%s' % (url1,)
         try:
             if len(data1) == 0:
                 response = self.session.post(url1, headers=headers, timeout=30)
@@ -141,9 +165,10 @@ class Request(object):
             print(e)
             return ()
         self.threading_id += 1
-        return (response.status_code, [url1.split("/")[-1], '%s%s' % ("Request url: ", url1), "Request headers: ", str(headers),
-                '%s%s' % ("Request body: ", data1), '%s%s' % ("Response code: ", response.status_code),
-                '%s%s' % ("Response body: ", response.text)], response.text, json_dict, json_body)
+        return (response.status_code,
+                [url1.split("/")[-1], '%s%s' % ("Request url: ", url1), "Request headers: ", str(headers),
+                 '%s%s' % ("Request body: ", data1), '%s%s' % ("Response code: ", response.status_code),
+                 '%s%s' % ("Response body: ", response.text)], response.text, json_dict, json_body)
 
     def start_thread_pool(self, thread_pool1, app_type):
         """
@@ -172,6 +197,12 @@ class Request(object):
         print("正在整理创建的数据...")
         sessions.DelaySessions.clear_up(app_type)
         print("测试报告准备中...")
+        print("备份测试数据中...")
+        # 备份本次测试数据
+        report.SaveSessions.SaveSessions().save_file()
+        print("发送邮件中...")
+        # 发送邮件
+        report.SendEmail.send_email()
         d2 = datetime.datetime.now()
         t = d2 - d1
         print('接口回归测试完成！')

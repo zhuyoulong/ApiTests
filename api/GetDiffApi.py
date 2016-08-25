@@ -20,8 +20,8 @@ class GetDiffApi(object):
         """
         初始化
         """
-        self.api_path = '%s%s' % (utils.GlobalList.SESSIONS_PATH, "\\api.txt")
-        self.session_path = '%s%s' % (utils.GlobalList.SESSIONS_PATH, "\\Api")
+        self.api_path = '%s\\api.txt' % (utils.GlobalList.SESSIONS_PATH,)
+        self.session_path = '%s\\Api' % (utils.GlobalList.SESSIONS_PATH,)
 
     def __get_api(self):
         """

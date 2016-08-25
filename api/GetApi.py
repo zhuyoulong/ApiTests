@@ -23,7 +23,7 @@ class GetApi(object):
         print("正在连接指定网址......")
         self.startData = datetime.datetime.now()
         self.Url = utils.GlobalList.API_URL
-        self.path = '%s%s' % (utils.GlobalList.SESSIONS_PATH, "\\api.txt")
+        self.path = '%s\\api.txt' % (utils.GlobalList.SESSIONS_PATH, )
 
     def __get_html(self):
         """

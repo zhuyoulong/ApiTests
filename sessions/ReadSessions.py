@@ -18,6 +18,9 @@ import utils.ApiException
 
 class ReadSessions(object):
     def __init__(self):
+        """
+        初始化
+        """
         self.sessions_path = '%s%s%s' % (utils.GlobalList.SESSIONS_PATH, "\\Api\\", utils.GlobalList.HOST)
 
     def __remove_special_files(self):
@@ -50,12 +53,12 @@ class ReadSessions(object):
         for s in utils.GlobalList.CREATE_DICT.keys():
             file_path = '%s\\%s.txt' % (self.sessions_path, s)
             if not os.path.exists(file_path):
-                raise utils.ApiException.ApiNotRecorded('%s接口未录制，接口回归测试退出' % (s,))
+                raise utils.ApiException.ApiNotRecorded('%s接口未录制，接口回归测试退出' % (s, ))
 
         for s in utils.GlobalList.DELETE_DICT.keys():
             file_path = '%s\\%s.txt' % (self.sessions_path, s)
             if not os.path.exists(file_path):
-                raise utils.ApiException.ApiNotRecorded('%s接口未录制，接口回归测试退出' % (s,))
+                raise utils.ApiException.ApiNotRecorded('%s接口未录制，接口回归测试退出' % (s, ))
 
     def __ignore_sessions(self):
         """
@@ -129,6 +132,10 @@ class ReadSessions(object):
             yield (self.get_single_session(i2))
 
     def get_will_request_sessions(self):
+        """
+        将要请求的最新接口数据源
+        :return:
+        """
         sessions = self.__get_all_session()
         for i in sessions:
             for j in i:

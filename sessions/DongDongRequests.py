@@ -137,7 +137,7 @@ class DongDongRequests(base.Request.Request):
                 sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, self.sessions[1],
                                                       "VerifyRequest")
         else:
-            sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, self.sessions[1], "")
+            self.timestamp__compare(self.sessions)
 
     def post(self, url1, method_name, json_dict, json_body, data1=None):
         """
