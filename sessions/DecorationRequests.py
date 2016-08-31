@@ -125,8 +125,16 @@ class DecorationRequests(base.Request.Request):
                 sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, self.sessions[1],
                                                       "ProgramCrash")
             else:
-                sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, self.sessions[1],
-                                                      "VerifyRequest")
+                expect_json_body = self.sessions[-1]
+                result_json_body = self.sessions[-3]
+                expect_code = utils.HandleJson.HandleJson.response_json_stats_code("status", expect_json_body)
+                result_code = utils.HandleJson.HandleJson.response_json_stats_code("status", result_json_body)
+                if expect_code == result_code:
+                    sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, self.sessions[1],
+                                                          "")
+                else:
+                    sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, self.sessions[1],
+                                                          "VerifyRequest")
         else:
             self.timestamp__compare(self.sessions)
 

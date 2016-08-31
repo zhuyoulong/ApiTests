@@ -29,6 +29,26 @@ class HandleJson(object):
         except (ValueError, KeyError, TypeError):
             print("JSON format error")
 
+    @staticmethod
+    def response_json_stats_code(key, json_data):
+        """
+        返回StatsCode状态码
+        :param key: 状态码字典的key
+        :param json_data:
+        :return:
+        """
+        data = ()
+        try:
+            data = json.loads(json_data)
+        except Exception as e:
+            print(e)
+            print("JSON format error")
+        if isinstance(data, dict):
+            for k in data.keys():
+                if k.startswith(key):
+                    return data[k]
+        return 0
+
     def decode_json(self, json_data):
         """
         解析json并返回对应的key|value
