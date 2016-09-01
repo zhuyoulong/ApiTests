@@ -21,3 +21,4 @@ DELETE_DICT = {}  # 删除接口字典 key >> 接口名 value >> 请求字段id
 MAPPING_DICT = {}  # 映射字典，即删除数据接口对应的创建数据接口
 HOST = ''
 BEFORE_SESSIONS = []  # 遍历前的全部接口，即ReadSessions读取的接口
+DUPLICATE_SWITCH = False  # 接口请求去重开关

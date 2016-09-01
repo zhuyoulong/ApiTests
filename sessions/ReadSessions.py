@@ -108,6 +108,12 @@ class ReadSessions(object):
             if i1.startswith("Session end"):
                 if len(single_session) == 4 and single_session[0].find(utils.GlobalList.HOST) != -1:
                     total_session.append(single_session)
+                    # 去除重复请求，依据request body判断
+                    if utils.GlobalList.DUPLICATE_SWITCH and len(total_session) > 1:
+                        for s in total_session:
+                            if single_session[1] == s[1]:
+                                total_session.remove(single_session)
+
                 single_session = []
         return total_session
 

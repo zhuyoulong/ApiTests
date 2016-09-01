@@ -43,7 +43,8 @@ class Config(object):
             'SessionsPath': '',
             'ApiURL': '',
             'SpecialSessions': '',
-            'SessionsPair': ''
+            'SessionsPair': '',
+            'DuplicateSwitch': False
         }
 
         self.__get_conf()
@@ -68,6 +69,8 @@ class Config(object):
         utils.GlobalList.SPECIAL_SESSIONS = self.conf['SpecialSessions']
         self.conf['SessionsPair'] = self.config.get(self.config.sections()[self.type], 'SessionsPair')
         utils.GlobalList.SESSIONS_PAIR = self.conf['SessionsPair']
+        self.conf['DuplicateSwitch'] = self.config.getboolean(self.config.sections()[self.type], 'DuplicateSwitch')
+        utils.GlobalList.DUPLICATE_SWITCH = self.conf['DuplicateSwitch']
         self.__init_data()
         utils.GlobalList.CONF = self.conf
 
