@@ -7,8 +7,8 @@
 """
 请求接口核心文件
 """
-
 import datetime
+import time
 import hashlib
 
 import requests
@@ -166,9 +166,11 @@ class Request(object):
             return ()
         self.threading_id += 1
         return (response.status_code,
-                [url1.split("/")[-1], '%s%s' % ("Request url: ", url1), "Request headers: ", str(headers),
-                 '%s%s' % ("Request body: ", data1), '%s%s' % ("Response code: ", response.status_code),
-                 '%s%s' % ("Response body: ", response.text)], response.text, json_dict, json_body)
+                [url1.split("/")[-1], 'Request url: %s' % (url1,), "Request headers: %s" % (headers,),
+                 'Request body: %s' % (data1,), 'Response code: %s' % (response.status_code,),
+                 'Response body: %s' % (response.text,),
+                 'Time-consuming: %sms' % (response.elapsed.microseconds / 1000,),
+                 'Sole-mark: %s' % (time.time(),)], response.text, json_dict, json_body)
 
     def start_thread_pool(self, thread_pool1, app_type):
         """
