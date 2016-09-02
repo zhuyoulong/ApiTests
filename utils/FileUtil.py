@@ -25,3 +25,17 @@ def get_files_root(sessions_path):
     :return:
     """
     return (os.path.join(root, f) for root, dirs, files in os.walk(sessions_path) for f in files)
+
+
+def get_files_exclude_folder(sessions_path):
+    """
+    获取目标地址目录下的文件列表路径，排除文件夹里面的文件
+    :param sessions_path: 文件地址
+    :return:
+    """
+    return (os.path.join(root, f) for root, dirs, files in os.walk(sessions_path) for f in files if root == sessions_path)
+
+if __name__ == '__main__':
+    g = get_files_exclude_folder('D:\\Fiddler Sessions\\Sessions\\ddzf-webapi.test.szhome.com\\')
+    for i in g:
+        print(i)

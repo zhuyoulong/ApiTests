@@ -16,6 +16,7 @@ import threadpool
 
 import report.SaveSessions
 import report.SendEmail
+import report.Report
 import retry.Retry
 import sessions.DelaySessions
 import sessions.ReadSessions
@@ -23,6 +24,7 @@ import sessions.WriteSessions
 import utils.CodeUtil
 import utils.HandleJson
 import utils.TimeUtil
+import utils.GlobalList
 
 
 def thread_pool(app_type, sessions1):
@@ -208,4 +210,6 @@ class Request(object):
         d2 = datetime.datetime.now()
         t = d2 - d1
         print('接口回归测试完成！')
+        report.Report.Report().get_total_sessions()
+        print('完成%s个接口请求' % (utils.GlobalList.TOTAL_SESSIONS,))
         print("%s %s%s" % ("耗时：", t.seconds, "s"))

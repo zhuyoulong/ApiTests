@@ -107,12 +107,24 @@ class ReadSessions(object):
                     single_session.append(json_body)
             if i1.startswith("Session end"):
                 if len(single_session) == 4 and single_session[0].find(utils.GlobalList.HOST) != -1:
-                    total_session.append(single_session)
-                    # 去除重复请求，依据request body判断
-                    if utils.GlobalList.DUPLICATE_SWITCH and len(total_session) > 1:
-                        for s in total_session:
-                            if single_session[1] == s[1]:
-                                total_session.remove(single_session)
+                    if utils.GlobalList.DUPLICATE_SWITCH:
+                        if len(total_session) == 0:
+                            total_session.append(single_session)
+                        else:
+                            # 去除重复请求，依据request body判断
+                            need_append = False
+                            for s in total_session:
+                                if single_session[0] == s[0] and single_session[1] == s[1]:
+                                    break
+                                if single_session[0] == s[0] and single_session[1] != s[1]:
+                                    total_session.append(single_session)
+                                    break
+                                if single_session[0] != s[0]:
+                                    need_append = True
+                            if need_append:
+                                total_session.append(single_session)
+                    else:
+                        total_session.append(single_session)
 
                 single_session = []
         return total_session
@@ -143,10 +155,7 @@ class ReadSessions(object):
         :return:
         """
         sessions = self.__get_all_session()
-        for i in sessions:
-            for j in i:
-                utils.GlobalList.TOTAL_SESSIONS += 1  # 请求的总接口数量
-                yield j
+        return (j for i in sessions for j in i)
 
 
 if __name__ == "__main__":
