@@ -15,7 +15,7 @@ import os
 import shutil
 import zipfile
 import utils.FileUtil
-import utils.GlobalList
+import utils.Consts
 import utils.TimeUtil
 
 
@@ -24,14 +24,14 @@ class SaveSessions(object):
         """
         初始化
         """
-        self.sessions_path = '%s\\Sessions\\%s\\' % (utils.GlobalList.SESSIONS_PATH, utils.GlobalList.HOST)
+        self.sessions_path = '%s\\Sessions\\%s\\' % (utils.Consts.SESSIONS_PATH, utils.Consts.HOST)
         self.conf_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.conf')
         self.format_time = '%Y%m%d%H%M%S'
-        self.zip_name = '%sV%s_b%s_%s.zip' % (utils.GlobalList.CONF['project'], utils.GlobalList.CONF['versionName'],
-                                              utils.GlobalList.CONF['versionCode'],
+        self.zip_name = '%sV%s_b%s_%s.zip' % (utils.Consts.CONF['project'], utils.Consts.CONF['versionName'],
+                                              utils.Consts.CONF['versionCode'],
                                               utils.TimeUtil.timestamp(self.format_time))
-        utils.GlobalList.ZIP_NAME = self.zip_name
-        self.save_path = '%s\\History Sessions' % (utils.GlobalList.SESSIONS_PATH,)
+        utils.Consts.ZIP_NAME = self.zip_name
+        self.save_path = '%s\\History Sessions' % (utils.Consts.SESSIONS_PATH,)
 
     def __compression_file(self):
         """

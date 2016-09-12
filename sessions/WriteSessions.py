@@ -17,12 +17,21 @@ response body
 import os
 import threading
 
-import utils.GlobalList
+import utils.Consts
 
 mutex = threading.Lock()
 
 
 def write_sessions(threading_id, threading_name, threading_queue, session, error_path):
+    """
+    封装线程
+    :param threading_id:
+    :param threading_name:
+    :param threading_queue:
+    :param session: 将要写入文件的session
+    :param error_path: session的文件路径（文件名）
+    :return:
+    """
     w = WriteSessions(threading_id, threading_name, threading_queue, session, error_path)
     w.start()
     w.join()  # 主线程等待子线程完成后退出，否则可能出现数据还未写完，就退出程序了
@@ -39,6 +48,10 @@ class WriteSessions(threading.Thread):
         self.path = ""
 
     def run(self):
+        """
+        执行线程操作
+        :return:
+        """
         global mutex
         if mutex.acquire():
             self.__write_session()
@@ -49,21 +62,13 @@ class WriteSessions(threading.Thread):
         把请求写入文件，一个请求一个文件
         :return:
         """
-        dir0 = '%s%s' % (utils.GlobalList.SESSIONS_PATH, "\\Sessions")
-        if not os.path.exists(dir0):
-            os.mkdir(dir0)
-        dir1 = '%s%s%s%s' % (utils.GlobalList.SESSIONS_PATH, "\\Sessions\\", utils.GlobalList.HOST, "\\")
-        if not os.path.exists(dir1):
-            try:
-                os.mkdir(dir1)
-            except FileExistsError:
-                print("FileExistsError")
+        dir1 = '%s\\Sessions\\%s\\' % (utils.Consts.SESSIONS_PATH, utils.Consts.HOST)
         if len(self.error_path) == 0:
             self.path = '%s%s%s' % (dir1, self.session[0], ".txt")
         else:
-            if not os.path.exists('%s%s' % (dir1, "Check\\")):
-                os.mkdir('%s%s' % (dir1, "Check\\"))
-            self.path = '%s%s%s%s' % (dir1, "Check\\", self.error_path, ".txt")
+            if not os.path.exists('%sCheck\\' % (dir1,)):
+                os.mkdir('%sCheck\\' % (dir1,))
+            self.path = '%sCheck\\%s.txt' % (dir1, self.error_path)
         with open(self.path, 'a', encoding='utf-8') as f:
             for i in self.session:
                 f.write(i)

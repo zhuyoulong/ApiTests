@@ -98,7 +98,7 @@ class RemoveSession(object):
         r = []
         for i in l:
             for j in i:
-                if j.find(self.t) != -1:
+                if self.t in j:
                     r.append(i)
         for i in r:
             l.remove(i)

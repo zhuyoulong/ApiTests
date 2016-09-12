@@ -36,6 +36,4 @@ def get_files_exclude_folder(sessions_path):
     return (os.path.join(root, f) for root, dirs, files in os.walk(sessions_path) for f in files if root == sessions_path)
 
 if __name__ == '__main__':
-    g = get_files_exclude_folder('D:\\Fiddler Sessions\\Sessions\\ddzf-webapi.test.szhome.com\\')
-    for i in g:
-        print(i)
+    pass

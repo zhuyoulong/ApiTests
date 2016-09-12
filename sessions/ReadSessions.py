@@ -11,9 +11,9 @@
 import os
 
 import utils.FileUtil
-import utils.GlobalList
+import utils.Consts
 import utils.HandleJson
-import utils.ApiException
+import utils.Errors
 
 
 class ReadSessions(object):
@@ -21,7 +21,7 @@ class ReadSessions(object):
         """
         初始化
         """
-        self.sessions_path = '%s%s%s' % (utils.GlobalList.SESSIONS_PATH, "\\Api\\", utils.GlobalList.HOST)
+        self.sessions_path = '%s%s%s' % (utils.Consts.SESSIONS_PATH, "\\Api\\", utils.Consts.HOST)
 
     def __remove_special_files(self):
         """
@@ -32,7 +32,7 @@ class ReadSessions(object):
         """
         f = utils.FileUtil.get_file_list(self.sessions_path)
         # str数据转换成list
-        remove_sessions = eval(utils.GlobalList.SPECIAL_SESSIONS)
+        remove_sessions = eval(utils.Consts.SPECIAL_SESSIONS)
         for i in f:
             for j in remove_sessions:
                 if i.startswith(j):
@@ -50,15 +50,15 @@ class ReadSessions(object):
         数据对应配置文件的SessionsPair
         :return:
         """
-        for s in utils.GlobalList.CREATE_DICT.keys():
+        for s in utils.Consts.CREATE_DICT.keys():
             file_path = '%s\\%s.txt' % (self.sessions_path, s)
             if not os.path.exists(file_path):
-                raise utils.ApiException.ApiNotRecorded('%s接口未录制，接口回归测试退出' % (s, ))
+                raise utils.Errors.ApiNotRecorded('%s接口未录制，接口回归测试退出' % (s, ))
 
-        for s in utils.GlobalList.DELETE_DICT.keys():
+        for s in utils.Consts.DELETE_DICT.keys():
             file_path = '%s\\%s.txt' % (self.sessions_path, s)
             if not os.path.exists(file_path):
-                raise utils.ApiException.ApiNotRecorded('%s接口未录制，接口回归测试退出' % (s, ))
+                raise utils.Errors.ApiNotRecorded('%s接口未录制，接口回归测试退出' % (s, ))
 
     def __ignore_sessions(self):
         """
@@ -67,7 +67,7 @@ class ReadSessions(object):
         """
         self.__remove_special_files()
         files = list(utils.FileUtil.get_file_list(self.sessions_path))
-        for s in utils.GlobalList.DELETE_DICT.keys():
+        for s in utils.Consts.DELETE_DICT.keys():
             file_path = '%s.txt' % (s, )
             if file_path in files:
                 files.remove(file_path)
@@ -106,8 +106,8 @@ class ReadSessions(object):
                     single_session.append(utils.HandleJson.HandleJson().decode_json(json_body))
                     single_session.append(json_body)
             if i1.startswith("Session end"):
-                if len(single_session) == 4 and single_session[0].find(utils.GlobalList.HOST) != -1:
-                    if utils.GlobalList.DUPLICATE_SWITCH:
+                if len(single_session) == 4 and utils.Consts.HOST in single_session[0]:
+                    if utils.Consts.DUPLICATE_SWITCH:
                         if len(total_session) == 0:
                             total_session.append(single_session)
                         else:
@@ -144,9 +144,9 @@ class ReadSessions(object):
         :return:
         """
         files = self.__ignore_sessions()
-        utils.GlobalList.BEFORE_SESSIONS.clear()
+        utils.Consts.BEFORE_SESSIONS.clear()
         for i2 in files:
-            utils.GlobalList.BEFORE_SESSIONS.append(i2)
+            utils.Consts.BEFORE_SESSIONS.append(i2)
             yield (self.get_single_session(i2))
 
     def get_will_request_sessions(self):

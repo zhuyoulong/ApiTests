@@ -11,7 +11,7 @@
 """
 
 import os
-import utils.GlobalList
+import utils.Consts
 
 
 class GetDiffApi(object):
@@ -20,8 +20,8 @@ class GetDiffApi(object):
         """
         初始化
         """
-        self.api_path = '%s\\api.txt' % (utils.GlobalList.SESSIONS_PATH,)
-        self.session_path = '%s\\Api' % (utils.GlobalList.SESSIONS_PATH,)
+        self.api_path = '%s\\api.txt' % (utils.Consts.SESSIONS_PATH,)
+        self.session_path = '%s\\Api' % (utils.Consts.SESSIONS_PATH,)
 
     def __get_api(self):
         """

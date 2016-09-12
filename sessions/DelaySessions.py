@@ -23,7 +23,7 @@ import re
 import base.Request
 import sessions.ReadSessions
 import utils.FileUtil
-import utils.GlobalList
+import utils.Consts
 
 
 def clear_up(app_type):
@@ -38,8 +38,11 @@ def clear_up(app_type):
 
 class DelaySessions(object):
     def __init__(self):
-        self.create_session_path = '%s\\Sessions\\%s\\' % (utils.GlobalList.SESSIONS_PATH, utils.GlobalList.HOST)
-        self.delete_session_path = '%s\\Api\\%s\\' % (utils.GlobalList.SESSIONS_PATH, utils.GlobalList.HOST)
+        """
+        初始化
+        """
+        self.create_session_path = '%s%s%s%s' % (utils.Consts.SESSIONS_PATH, "\\Sessions\\", utils.Consts.HOST, "\\")
+        self.delete_session_path = '%s%s%s%s' % (utils.Consts.SESSIONS_PATH, "\\Api\\", utils.Consts.HOST, "\\")
         self.create_sessions_parameter_value = self.__get_all_session_create_parameter()
 
     def __get_single_session_create_parameter(self, session_name):
@@ -49,11 +52,11 @@ class DelaySessions(object):
         """
         total_session = []
         parameter = []
-        file_path = '%s%s.txt' % (self.create_session_path, session_name)
+        file_path = '%s%s%s' % (self.create_session_path, session_name, '.txt')
         if os.path.exists(file_path):
             total_session = sessions.ReadSessions.ReadSessions().get_single_session_full_path(
-                '%s%s.txt' % (self.create_session_path, session_name))
-        req = re.compile(r'"%s":(.+?)[,}]' % (utils.GlobalList.CREATE_DICT[session_name],))
+                '%s%s%s' % (self.create_session_path, session_name, '.txt'))
+        req = re.compile(r'"%s":(.+?)[,}]' % (utils.Consts.CREATE_DICT[session_name], ))
         for i in total_session:
             match = re.findall(req, i[-1])
             if len(match) > 0:
@@ -68,7 +71,7 @@ class DelaySessions(object):
         :return:
         """
         create_parameter = {}
-        for i in utils.GlobalList.CREATE_DICT.keys():
+        for i in utils.Consts.CREATE_DICT.keys():
             create_parameter[i] = self.__get_single_session_create_parameter(i)
         return create_parameter
 
@@ -78,8 +81,8 @@ class DelaySessions(object):
         :return:
         """
         total_session = []
-        delete_session_name = utils.GlobalList.DELETE_DICT[session_name]
-        file_path = '%s%s.txt' % (self.delete_session_path, session_name)
+        delete_session_name = utils.Consts.DELETE_DICT[session_name]
+        file_path = '%s%s%s' % (self.delete_session_path, session_name, '.txt')
         if os.path.exists(file_path):
             total_session = sessions.ReadSessions.ReadSessions().get_single_session_full_path(file_path)
         req = re.compile(r'%s=(.+?)&' % (delete_session_name,))  # 多字段情况
@@ -90,10 +93,10 @@ class DelaySessions(object):
                 if len(match) == 0:
                     match = re.findall(req1, i[1])
                 temp = match[0].split('=')[-1]
-                for j in utils.GlobalList.MAPPING_DICT.keys():
+                for j in utils.Consts.MAPPING_DICT.keys():
                     if j == session_name:
                         # 匹配对应的创建数据接口
-                        create_session_name = utils.GlobalList.MAPPING_DICT[session_name]
+                        create_session_name = utils.Consts.MAPPING_DICT[session_name]
                         # 取第一个值，用完删除
                         value = self.create_sessions_parameter_value[create_session_name][0]
                         i = str(i).replace(str(temp), value)  # 替换value
@@ -109,8 +112,8 @@ class DelaySessions(object):
         """
         # 根据创建数据接口找到对应的删除接口，并拿出创建数据接口值的长度，多长就调用多少次对应删除接口
         for i in self.create_sessions_parameter_value.keys():
-            for j in utils.GlobalList.MAPPING_DICT.keys():
-                if utils.GlobalList.MAPPING_DICT[j] == i:
+            for j in utils.Consts.MAPPING_DICT.keys():
+                if utils.Consts.MAPPING_DICT[j] == i:
                     for k in range(1, len(self.create_sessions_parameter_value[i]) + 1):
                         # 此处可优化 目前会读取多次文件
                         yield self.__get_single_session_delete_parameter(j)

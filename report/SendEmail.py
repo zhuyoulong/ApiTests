@@ -12,7 +12,7 @@ from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-import utils.GlobalList
+import utils.Consts
 
 
 def send_email():
@@ -20,7 +20,7 @@ def send_email():
     邮件发送
     :return:
     """
-    conf = utils.GlobalList.CONF
+    conf = utils.Consts.CONF
     app_name = conf['project']
     app_version = conf['versionName']
     app_build_version = conf['versionCode']
@@ -42,9 +42,9 @@ def send_email():
 
     body = MIMEText(message, _subtype='html', _charset='utf-8')
     # 本次测试结果附件
-    part = MIMEApplication(open(os.path.join(utils.GlobalList.SESSIONS_PATH, 'History Sessions',
-                                             utils.GlobalList.ZIP_NAME), 'rb').read())
-    part.add_header('Content-Disposition', 'attachment', filename=urllib.request.quote(utils.GlobalList.ZIP_NAME))
+    part = MIMEApplication(open(os.path.join(utils.Consts.SESSIONS_PATH, 'History Sessions',
+                                             utils.Consts.ZIP_NAME), 'rb').read())
+    part.add_header('Content-Disposition', 'attachment', filename=urllib.request.quote(utils.Consts.ZIP_NAME))
 
     msg = MIMEMultipart()
     msg.attach(body)

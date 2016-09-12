@@ -11,8 +11,8 @@ import os
 import shutil
 
 import conf.Config
-import utils.GlobalList
-import utils.ApiException
+import utils.Consts
+import utils.Errors
 
 
 def choose_app_type(app_type):
@@ -22,14 +22,10 @@ def choose_app_type(app_type):
     :return:
     """
     if app_type == 1:
-        import sessions.DongDongRequests
-        sessions.DongDongRequests.DongDongRequests().start()
+        import sessions.A
+        sessions.A.A().start()
     if app_type == 2:
-        import sessions.JiaZaiRequests
-        sessions.JiaZaiRequests.JiaZaiRequests().start()
-    if app_type == 3:
-        import sessions.DecorationRequests
-        sessions.DecorationRequests.DecorationRequests().start()
+        pass
 
 
 def clear_data(api_type):
@@ -39,10 +35,12 @@ def clear_data(api_type):
     :return:
     """
     print('清理测试数据...')
-    conf.Config.Config(api_type)
-    path = '%s\\Sessions\\%s' % (utils.GlobalList.SESSIONS_PATH, utils.GlobalList.HOST)
+    c = conf.Config.Config(api_type)
+    c.get_conf()  # 读取配置文件
+    path = '%s\\Sessions\\%s' % (utils.Consts.SESSIONS_PATH, utils.Consts.HOST)
     if os.path.exists(path):
         shutil.rmtree(path)
+    c.save_conf()  # 保存本次配置
 
 
 def launcher_api_test(app_type, api_type=0):
@@ -51,15 +49,15 @@ def launcher_api_test(app_type, api_type=0):
     :param api_type: 接口类型
     0:A  内网测试  服务
     1:A  线上测试  服务
-    2:B 内网测试  服务
+    2:B  内网测试  服务
     3:B  线上正式  服务
     ......
     :param app_type: 1 >> A; 2 >> B; 3 >> C
     :return:
     """
     mapping = {1: '01', 2: '23'}
-    if mapping[app_type].find(str(api_type)) == -1:
-        raise utils.ApiException.MappingError('应用类型与接口类型不匹配，请确认！')
+    if str(api_type) not in mapping[app_type]:
+        raise utils.Errors.MappingError('应用类型与接口类型不匹配，请确认！')
     clear_data(api_type)
     choose_app_type(app_type)
 

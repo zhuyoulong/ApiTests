@@ -16,13 +16,13 @@ import os
 import base.Request
 import sessions.ReadSessions
 import utils.FileUtil
-import utils.GlobalList
+import utils.Consts
 
 
 def retry11(app_type, retry=3):
     """
     重试机制，默认3次
-    :param app_type: 0 >> A; 1 >> B; 2 >> C; 3 >> D
+    :param app_type: 1 >> 咚咚; 2 >> 家在; 3 >> 装修
     :param retry: 重试次数
     :return:
     """
@@ -34,9 +34,13 @@ def retry11(app_type, retry=3):
 
 class Retry(object):
     def __init__(self, retry):
+        """
+        初始化
+        :param retry:
+        """
         self.retry = retry
         self.after_normal_sessions_path = '%s%s%s' % (
-            utils.GlobalList.SESSIONS_PATH, "\\Sessions\\", utils.GlobalList.HOST)
+            utils.Consts.SESSIONS_PATH, "\\Sessions\\", utils.Consts.HOST)
 
     def __get_normal_after_sessions(self):
         """
@@ -79,14 +83,13 @@ class Retry(object):
         :param sessions_type:
         :return:
         """
-        path = '%s%s%s%s' % (self.after_normal_sessions_path, '\\Check\\', sessions_type, '.txt')
-        try:
+        path = '%s\\Check\\%s.txt' % (self.after_normal_sessions_path, sessions_type)
+        if os.path.exists(path):
             l = open(path, encoding='utf-8').readlines()
-            sessions1 = ('%s%s' % (i.replace('\n', '')[::-1].split('/', 1)[0][::-1], '.txt') for i in l if
+            sessions1 = ('%s.txt' % (i.replace('\n', '')[::-1].split('/', 1)[0][::-1]) for i in l if
                          i.startswith('Request url: '))
             return list(set(sessions1))
-        except FileNotFoundError:
-            return ()
+        return ()
 
     def get_diff(self):
         """
@@ -97,7 +100,7 @@ class Retry(object):
         3.其他未知情况的接口（如 代码异常导致）
         :return:
         """
-        before_sessions = utils.GlobalList.BEFORE_SESSIONS
+        before_sessions = utils.Consts.BEFORE_SESSIONS
         after_sessions = []
         normal_after_sessions = self.__get_normal_after_sessions()
         not_normal_after_sessions = self.__get_not_normal_after_sessions()
@@ -130,9 +133,9 @@ class Retry(object):
                 print('发现录制异常接口：' + d)
                 print('执行移除操作，移除重试队列')
                 # 移除录制异常的接口
-                os.remove('%s%s%s%s%s' % (utils.GlobalList.SESSIONS_PATH, "\\Api\\", utils.GlobalList.HOST, "\\", d))
+                os.remove('%s\\Api\\%s\\%s' % (utils.Consts.SESSIONS_PATH, utils.Consts.HOST, d))
                 # 全局变量遍历前的全部接口也需要移除
-                utils.GlobalList.BEFORE_SESSIONS.remove(d)
+                utils.Consts.BEFORE_SESSIONS.remove(d)
             else:
                 yield sessions.ReadSessions.ReadSessions().get_single_session(d)
 

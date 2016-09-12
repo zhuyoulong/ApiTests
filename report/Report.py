@@ -78,6 +78,8 @@ class Report(object):
                 return False
             if os.path.exists('%sErrorResponse.txt' % (self.check_sessions_path,)):
                 return False
+            if os.path.exists('%sTimestampCompare.txt' % (self.check_sessions_path,)):
+                return False
         return True
 
 

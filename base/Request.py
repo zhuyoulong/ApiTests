@@ -7,24 +7,26 @@
 """
 请求接口核心文件
 """
+
 import datetime
+import difflib
+import json
 import time
-import hashlib
 
 import requests
 import threadpool
 
+import report.Report
 import report.SaveSessions
 import report.SendEmail
-import report.Report
 import retry.Retry
 import sessions.DelaySessions
 import sessions.ReadSessions
 import sessions.WriteSessions
 import utils.CodeUtil
+import utils.Consts
 import utils.HandleJson
 import utils.TimeUtil
-import utils.GlobalList
 
 
 def thread_pool(app_type, sessions1):
@@ -37,14 +39,10 @@ def thread_pool(app_type, sessions1):
     requests1 = []
     pool = threadpool.ThreadPool(8)
     if app_type == 1:
-        import sessions.DongDongRequests
-        requests1 = threadpool.makeRequests(sessions.DongDongRequests.DongDongRequests().thread_pool, sessions1)
+        import sessions.A
+        requests1 = threadpool.makeRequests(sessions.A.A().thread_pool, sessions1)
     elif app_type == 2:
-        import sessions.JiaZaiRequests
-        requests1 = threadpool.makeRequests(sessions.JiaZaiRequests.JiaZaiRequests().thread_pool, sessions1)
-    elif app_type == 3:
-        import sessions.DecorationRequests
-        requests1 = threadpool.makeRequests(sessions.DecorationRequests.DecorationRequests().thread_pool, sessions1)
+        pass
     [pool.putRequest(req) for req in requests1]
     pool.wait()
 
@@ -55,7 +53,6 @@ class Request(object):
         初始化
         """
         self.thread_count = thread_count
-        self.AUTHORIZATION_IMAGE_UPLOAD = ""
         self.session = requests.session()
         self.TOKEN_NAME = ""
         self.TOKEN_VALUE = ""
@@ -64,9 +61,9 @@ class Request(object):
         self.uPhone = ""
         self.SessionId = ""
         self.uType = "0"
-        self.temp = "ABC"
+        self.temp = ""
         self.time = ""
-        self.format_time = '%Y-%m-%d %H:%M:%S'
+        self.format_time = ''
         self.threading_id = 0
 
     def get_token_des(self):
@@ -74,23 +71,17 @@ class Request(object):
         生成token密文
         :return:
         """
-        m = hashlib.md5()
-        m.update(self.temp.encode())
-        return m.hexdigest()
+        pass
 
     def get_session_des(self, method_name):
         """
         生成普通请求密文
         :return:
         """
-        date = utils.TimeUtil.timestamp(self.format_time)
-        temp = "%s%s%s%s%s" % (self.TOKEN_NAME, date, "", method_name, self.TOKEN_VALUE)
-        m = hashlib.md5()
-        m.update(temp.encode())
-        return m.hexdigest(), date
+        pass
 
-    def diff_verify_write(self, sessions1, expect_json_body, expect_json_list, result_json_body, result_json_list, diff,
-                          session_name):
+    def __diff_verify_write(self, sessions1, expect_json_body, expect_json_list, result_json_body, result_json_list,
+                            diff, session_name):
         """
         主要用于差异化写入文件
         :param sessions1: 请求返回的session
@@ -109,7 +100,72 @@ class Request(object):
         sessions1.append('Diff: %s' % (diff,))
         sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, sessions1, session_name)
 
-    def timestamp__compare(self, sessions2):
+    def post_request(self, sessions1, key1, key2):
+        """
+        请求接口，获得session
+        :param sessions1: 返回的sessions
+        :param key1: 类似之前的StatsCode
+        :param key2: 类似之前的Message
+        :return:
+        """
+        # verify response body
+        expect_json_body = sessions1[-1]
+        expect_json_list = sessions1[-2]
+        result_json_body = sessions1[-3]
+        result_json_list = utils.HandleJson.HandleJson().decode_json(result_json_body)
+        diff = list(set(expect_json_list) ^ set(result_json_list))  # 求差集
+
+        if sessions1[0] != 200:
+            sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, sessions1[1],
+                                                  "ErrorResponse")
+            return
+        if not diff:
+            self.__un_diff_verify_write(sessions1, key1, key2)
+        elif 0.8 < difflib.SequenceMatcher(None, expect_json_list, result_json_list).ratio() < 1.0:
+            # 相似度最低限度初定为80%，后续跟进实际情况调整
+            # 计算2个list相似度，大于80%小于100%才判断预期，排除大部分数据影响
+            self.__diff_verify_write(sessions1[1], expect_json_body, expect_json_list, result_json_body,
+                                     result_json_list, diff, "Unexpected")
+        elif len(expect_json_list) == len(result_json_list):
+            if json.loads(sessions1[-1])[key1] == json.loads(sessions1[-3])[key1]:
+                # 长度相等且response json code相等时 主要验证字段类型改变 如：整型变成布尔型
+                self.__diff_verify_write(sessions1[1], expect_json_body, expect_json_list, result_json_body,
+                                         result_json_list, diff, "FieldChange")
+            else:
+                sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, sessions1[1],
+                                                      "VerifyRequest")
+        else:
+            # 相似度太低一般由于数据影响，这一块暂不考虑
+            self.__un_diff_verify_write(sessions1, key1, key2)
+
+    def __un_diff_verify_write(self, sessions1, key1, key2):
+        """
+        没有差异化以及差异化太大时的验证
+        :param sessions1: 返回的sessions
+        :param key1: 类似之前的StatsCode
+        :param key2: 类似之前的Message
+        :return:
+        """
+        status = json.loads(sessions1[-3])[key1]
+        if status != 1 and status != -1 and status != 200:
+            if "异常" in json.loads(sessions1[-3])[key2]:
+                sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, sessions1[1],
+                                                      "ProgramCrash")
+            else:
+                expect_json_body = sessions1[-1]
+                result_json_body = sessions1[-3]
+                expect_code = utils.HandleJson.HandleJson.response_json_stats_code(key1, expect_json_body)
+                result_code = utils.HandleJson.HandleJson.response_json_stats_code(key1, result_json_body)
+                if expect_code == result_code:
+                    sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, sessions1[1],
+                                                          "")
+                else:
+                    sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, sessions1[1],
+                                                          "VerifyRequest")
+        else:
+            self.__timestamp__compare(sessions1)
+
+    def __timestamp__compare(self, sessions2):
         """
         time参数时间戳长度对比，不一致则存入TimestampCompare文件
         :return:
@@ -117,8 +173,10 @@ class Request(object):
         result_param_length = utils.HandleJson.HandleJson().is_time_param(sessions2[-3])
         expect_param_length = utils.HandleJson.HandleJson().is_time_param(sessions2[-1])
         if len(result_param_length) > 0 and len(expect_param_length) > 0:
+
             diff = list(set(result_param_length) ^ set(expect_param_length))
-            if diff:
+            length = len(diff)
+            if length > 1 and length % 2 == 0:  # 是2的倍数的才写入文件，单数时是由于未读等原因时间是0长度为1，不属于bug
                 sessions2[1].append('Expect json body: %s' % (sessions2[-1],))
                 sessions2[1].append('Result json body: %s' % (sessions2[-3],))
                 sessions2[1].append('Timestamp diff length: %s' % (diff,))
@@ -129,7 +187,7 @@ class Request(object):
         else:
             sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, sessions2[1], "")
 
-    def post_session(self, url1, headers, json_dict, json_body, data1=None):
+    def __post_session(self, url1, headers, json_dict, json_body, data1=None):
         """
         发送请求并简单校验response，再写入文件
         :param url1: 请求的url
@@ -140,24 +198,14 @@ class Request(object):
         :return:
         """
         if not url1.startswith("http://"):
-            url1 = 'http://%s' % (url1,)
+            url1 = '%s%s' % ("http://", url1)
+        print(url1)
         try:
-            if len(data1) == 0:
+            if data1 is None:
                 response = self.session.post(url1, headers=headers, timeout=30)
             else:
                 data1 = utils.CodeUtil.url_encode(data1)
                 response = self.session.post(url1, headers=headers, data=data1, timeout=30)
-        except UnicodeEncodeError:
-            print('%s%s' % ('url: ', url1))
-            print('%s%s' % ('UnicodeEncodeError request body ', data1))
-            return ()
-        except TimeoutError:
-            print('%s%s' % ('TimeoutError url: ', url1))
-            return ()
-        except requests.ConnectionError as e:
-            print('%s%s' % ('ConnectionError url: ', url1))
-            print(e)
-            return ()
         except requests.RequestException as e:
             print('%s%s' % ('RequestException url: ', url1))
             print(e)
@@ -167,18 +215,32 @@ class Request(object):
             print(e)
             return ()
         self.threading_id += 1
+        # 接口耗时记录
+        time_consuming = response.elapsed.microseconds / 1000
+        utils.Consts.STRESS_LIST.append(time_consuming)
         return (response.status_code,
                 [url1.split("/")[-1], 'Request url: %s' % (url1,), "Request headers: %s" % (headers,),
                  'Request body: %s' % (data1,), 'Response code: %s' % (response.status_code,),
-                 'Response body: %s' % (response.text,),
-                 'Time-consuming: %sms' % (response.elapsed.microseconds / 1000,),
+                 'Response body: %s' % (response.text,), 'Time-consuming: %sms' % (time_consuming,),
                  'Sole-mark: %s' % (time.time(),)], response.text, json_dict, json_body)
+
+    def post(self, sessions1, session_header, key1, key2):
+        """
+        请求接口
+        :param sessions1:返回的sessions
+        :param session_header: 获取头部方法
+        :param key1: 类似之前的StatsCode
+        :param key2: 类似之前的Message
+        :return:
+        """
+        sessions2 = self.__post_session(sessions1[0], session_header, sessions1[2], sessions1[-1], sessions1[1])
+        self.post_request(sessions2, key1, key2)
 
     def start_thread_pool(self, thread_pool1, app_type):
         """
         开始请求接口
         :param thread_pool1: 线程池
-        :param app_type: 0 >> A; 1 >> B; 2 >> C; 3 >> D
+        :param app_type: 1 >> 咚咚; 2 >> 家在; 3 >> 装修
         :return:
         """
         d1 = datetime.datetime.now()
@@ -211,5 +273,5 @@ class Request(object):
         t = d2 - d1
         print('接口回归测试完成！')
         report.Report.Report().get_total_sessions()
-        print('完成%s个接口请求' % (utils.GlobalList.TOTAL_SESSIONS,))
+        print('完成%s个接口请求' % (utils.Consts.TOTAL_SESSIONS,))
         print("%s %s%s" % ("耗时：", t.seconds, "s"))

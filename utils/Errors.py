@@ -1,7 +1,7 @@
 #!/usr/bin/evn python
 # -*- coding:utf-8 -*-
 
-# FileName ApiException.py
+# FileName Errors.py
 # Author: HeyNiu
 # Created Time: 2016/8/22
 """

@@ -11,7 +11,7 @@
 import urllib.request
 import re
 import datetime
-import utils.GlobalList
+import utils.Consts
 
 
 class GetApi(object):
@@ -22,8 +22,8 @@ class GetApi(object):
         """
         print("正在连接指定网址......")
         self.startData = datetime.datetime.now()
-        self.Url = utils.GlobalList.API_URL
-        self.path = '%s\\api.txt' % (utils.GlobalList.SESSIONS_PATH, )
+        self.Url = utils.Consts.API_URL
+        self.path = '%s\\api.txt' % (utils.Consts.SESSIONS_PATH,)
 
     def __get_html(self):
         """
@@ -60,7 +60,7 @@ class GetApi(object):
         """
         api = self.__get_api()
         print("接口清洗中......")
-        return (index for index in api if index[0].startswith(utils.GlobalList.API_URL.split('API')[-1]))
+        return (index for index in api if index[0].startswith(utils.Consts.API_URL.split('API')[-1]))
 
     def __write_file(self, path):
         """

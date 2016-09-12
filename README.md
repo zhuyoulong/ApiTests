@@ -2,34 +2,6 @@
 **ApiTests**是一个快速验证接口正确性的框架，主要用于回归验证，亦可用于接口测试（需要拓展，目前还未支持，考虑后面加上）。
 
 
-
-#### 关于这个框架
-
-**设计初衷：**
-
-解决我们项目的接口测试痛点。从之前的1-2小时测试时间压缩到现在的1分钟以内，效率提升，效果显著
-
-**对于读者：**
-
-- 完全符合你们项目
-  - 庆幸的是入手即用，方便快捷
-  - 需要注意的是，不要做伸手党，可以了解这个框架后，再去针对性的优化，让它更符合你们项目
-- 部分符合你们项目
-  - 提取出部分内容，加入到你们项目中
-- 完全不符合你们项目
-  - 提供一种思路，虽然可能没什么用，但是能了解到别人对这件事是怎么思考的
-
-**关于框架代码结构：**
-
-- 非程序出身，目前框架状态还是比较满意的
-- 结构设计可能有些问题，但是不影响使用
-  - 如发现设计不合理之处，欢迎指正
-  - 先出成果再作优化
-
-
-- 此框架服务于测试流程、效率，是一个工具
-- 至少目前认为手工+自动化才是最符合我们项目
-
 #### 功能
 
 具体查看框架思路
@@ -42,6 +14,7 @@
 - 可以屏蔽特殊接口
 - 创建的数据清理
 - 重试机制
+- 接口去重
 
 
 #### 接口流程走向
@@ -52,55 +25,40 @@
 读取配置文件中...
 读取接口数据中...
 接口请求中，请等待...
-http://a-b.test.c.com/api/Circle/AddCancelCollectCircle
+http://your host/api/
 ....................................................
-http://a-b.test.c.com/api/GroupActivity/UploadActivityImage
-http://a-b.test.c.com/api/photo/UploadImage
-RequestException url: http://a-b.test.c.com/api/Demand/GetDemandKnockSourceListV4
-HTTPConnectionPool(host='http://a-b.test.c.com', port=80): Read timed out. (read timeout=30)
+http://your host/api/
+http://your host/api/
+RequestException url: http://your host/api/
+HTTPConnectionPool(host='http://your host', port=80): Read timed out. (read timeout=30)
 IndexError url:
-http://a-b.test.c.com/api/Demand/GetDemandKnockSourceListV4
+http://your host/api/
 接口请求完成！
 发现diff接口，重试机制启动...
 第1次尝试请求diff...
-diff sessions: GetDemandKnockSourceListV4.txt
-diff sessions: GetSecondHouseTopic.txt
-http://a-b.test.c.com/api/Demand/GetDemandKnockSourceListV4
-http://a-b.test.c.com/api/SecondHouseSource/GetSecondHouseTopic
-RequestException url: http://a-b.test.c.com/api/Demand/GetDemandKnockSourceListV4
-HTTPConnectionPool(host='http://a-b.test.c.com', port=80): Read timed out. (read timeout=30)
+diff sessions: A.txt
+diff sessions: B.txt
+http://your host/api/A
+http://your host/api/B
+RequestException url: http://your host/api/B
+HTTPConnectionPool(host='http://your host', port=80): Read timed out. (read timeout=30)
 IndexError url:
-http://a-b.test.c.com/api/Demand/GetDemandKnockSourceListV4
+http://your host/api/B
 发现diff存在，继续尝试请求...
-第2次尝试请求diff...
-diff sessions: GetDemandKnockSourceListV4.txt
-http://a-b.test.c.com/api/Demand/GetDemandKnockSourceListV4
-RequestException url: http://a-b.test.c.com/api/Demand/GetDemandKnockSourceListV4
-HTTPConnectionPool(host='http://a-b.test.c.com', port=80): Read timed out. (read timeout=30)
-IndexError url:
-http://a-b.test.c.com/api/Demand/GetDemandKnockSourceListV4
-发现diff存在，继续尝试请求...
-第3次尝试请求diff...
-diff sessions: GetDemandKnockSourceListV4.txt
-http://a-b.test.c.com/api/Demand/GetDemandKnockSourceListV4
-RequestException url: http://a-b.test.c.com/api/Demand/GetDemandKnockSourceListV4
-HTTPConnectionPool(host='http://a-b.test.c.com', port=80): Read timed out. (read timeout=30)
-IndexError url:
-http://a-b.test.c.com/api/Demand/GetDemandKnockSourceListV4
 diff请求完成...
 正在整理创建的数据...
 清理创建的接口数据...
-http://a-b.test.c.com/api/Circle/DeleteContent
-http://a-b.test.c.com/api/Group/DeleteAnnouncement
-http://a-b.test.c.com/api/RentDemand/DeleteRentDemandById
-http://a-b.test.c.com/api/GroupFile/DeleteGroupFile
-http://a-b.test.c.com/api/GroupDynamic/DeleteGroupDynamic
-http://a-b.test.c.com/api/Demand/DeleteDemandById
-http://a-b.test.c.com/api/GroupActivity/DeleteGroupActivity
+http://your host/api/
+http://your host/api/
+http://your host/api/
+http://your host/api/
+http://your host/api/
+http://your host/api/
+http://your host/api/
 接口数据清理完成！
 测试报告准备中...
 接口回归测试完成！
-耗时： 125s
+耗时： 65s
 ```
 
 #### 请求接口后写入本地的数据说明
@@ -164,7 +122,7 @@ GetUserInfoV2 >> 正常接口（一个接口一个文件）
   ```javascript
 
   	//自定义参数设置
-  	public static var filterUrl = "a-webapi.test.b.com";
+  	public static var filterUrl = "your host";
   	public static var filePath = "D:\\Fiddler Sessions\\Api\\";
   	public static var filePathForRequested = "D:\\Fiddler Sessions\\Requested.txt";
   	public static var filePathForErrorResponse = "D:\\Fiddler Sessions\\ErrorResponse.txt";
