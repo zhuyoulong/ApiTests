@@ -48,7 +48,7 @@ class AddSession(object):
         :return:返回匹配的文件
         """
         self.__get_session()
-        return [i for i in self.__get_file_list() if i.startswith(self.url)]
+        return [i for i in self.__get_file_list() if i in self.url]
 
     def __write_file(self):
         """
@@ -58,11 +58,11 @@ class AddSession(object):
         try:
             with open(self.target_file_path, 'a', encoding='utf-16-le') as f:
                 for i in self.session:
-                    f.write(i)
+                    f.write(str(i).encode('utf-16-le'))
         except UnicodeEncodeError:
             with open(self.target_file_path, 'a', encoding='utf-8') as f:
                 for i in self.session:
-                    f.write(i)
+                    f.write(str(i).encode('utf-8'))
 
     def append_session_file(self):
         """
