@@ -146,22 +146,29 @@ class Request(object):
         :param key2: 类似之前的Message
         :return:
         """
+        crash = ['异常', '找不到方法', '	服务器无法在已发送', '已成功与服务器建立连接', '给定关键字不在字典中',
+                 '未将对象引用', '格式化程序尝试对消息反序列化时引发异常', '附近有语法错误', '	列名',
+                 'SQL Server', '超时时间已到', '在控制器', '溢出', '转换为', '远程主机强迫关闭了一个现有的连接',
+                 'could not connect to redis', '未能加载文件或程序集', '该字符串未被识别为有效的', '程序集',
+                 '必须声明标量变量', '输入字符串的格式不正确', '握手期间', '无法连接到远程服务器', '未能解析此远程名称',
+                 'Unable to Connect', 'Timeout', '接收时发生错误', '格式化程序尝试']
         status = json.loads(sessions1[-3])[key1]
         if status != 1 and status != -1 and status != 200:
-            if "异常" in json.loads(sessions1[-3])[key2]:
-                sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, sessions1[1],
-                                                      "ProgramCrash")
-            else:
-                expect_json_body = sessions1[-1]
-                result_json_body = sessions1[-3]
-                expect_code = utils.HandleJson.HandleJson.response_json_stats_code(key1, expect_json_body)
-                result_code = utils.HandleJson.HandleJson.response_json_stats_code(key1, result_json_body)
-                if expect_code == result_code:
+            for i in crash:
+                if i in json.loads(sessions1[-3])[key2]:
                     sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, sessions1[1],
-                                                          "")
+                                                          "ProgramCrash")
                 else:
-                    sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, sessions1[1],
-                                                          "VerifyRequest")
+                    expect_json_body = sessions1[-1]
+                    result_json_body = sessions1[-3]
+                    expect_code = utils.HandleJson.HandleJson.response_json_stats_code(key1, expect_json_body)
+                    result_code = utils.HandleJson.HandleJson.response_json_stats_code(key1, result_json_body)
+                    if expect_code == result_code:
+                        sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, sessions1[1],
+                                                              "")
+                    else:
+                        sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, sessions1[1],
+                                                              "VerifyRequest")
         else:
             self.__timestamp__compare(sessions1)
 
