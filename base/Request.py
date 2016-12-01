@@ -153,22 +153,25 @@ class Request(object):
                  '必须声明标量变量', '输入字符串的格式不正确', '握手期间', '无法连接到远程服务器', '未能解析此远程名称',
                  'Unable to Connect', 'Timeout', '接收时发生错误', '格式化程序尝试']
         status = json.loads(sessions1[-3])[key1]
+        is_crash = False
         if status != 1 and status != -1 and status != 200:
             for i in crash:
                 if i in json.loads(sessions1[-3])[key2]:
                     sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, sessions1[1],
                                                           "ProgramCrash")
+                    is_crash = True
+                    break
+            if not is_crash:
+                expect_json_body = sessions1[-1]
+                result_json_body = sessions1[-3]
+                expect_code = utils.HandleJson.HandleJson.response_json_stats_code(key1, expect_json_body)
+                result_code = utils.HandleJson.HandleJson.response_json_stats_code(key1, result_json_body)
+                if expect_code == result_code:
+                    sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, sessions1[1], "")
                 else:
-                    expect_json_body = sessions1[-1]
-                    result_json_body = sessions1[-3]
-                    expect_code = utils.HandleJson.HandleJson.response_json_stats_code(key1, expect_json_body)
-                    result_code = utils.HandleJson.HandleJson.response_json_stats_code(key1, result_json_body)
-                    if expect_code == result_code:
-                        sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, sessions1[1],
-                                                              "")
-                    else:
-                        sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, sessions1[1],
-                                                              "VerifyRequest")
+                    sessions.WriteSessions.write_sessions(self.threading_id, "t", self.threading_id, sessions1[1],
+                                                          "VerifyRequest")
+
         else:
             self.__timestamp__compare(sessions1)
 
