@@ -73,11 +73,11 @@ class Config(object):
         utils.Consts.API_URL = self.conf['ApiURL']
         self.conf['SpecialSessions'] = self.config.get(self.config.sections()[self.type], 'SpecialSessions')
         utils.Consts.SPECIAL_SESSIONS = self.conf['SpecialSessions']
-        self.conf['SessionsPair'] = self.config.get(self.config.sections()[self.type], 'SessionsPair')
-        utils.Consts.SESSIONS_PAIR = self.conf['SessionsPair']
+        # self.conf['SessionsPair'] = self.config.get(self.config.sections()[self.type], 'SessionsPair')
+        # utils.Consts.SESSIONS_PAIR = self.conf['SessionsPair']
         self.conf['DuplicateSwitch'] = self.config.getboolean(self.config.sections()[self.type], 'DuplicateSwitch')
         utils.Consts.DUPLICATE_SWITCH = self.conf['DuplicateSwitch']
-        self.__init_data()
+        # self.__init_data()
         utils.Consts.CONF = self.conf
 
     def __init_data(self):

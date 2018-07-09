@@ -260,6 +260,7 @@ class Request(object):
         l = s.get_will_request_sessions()  # 获取将要请求的所有接口数据
         print("接口请求中，请等待...")
 
+        #创建线程池，默认线程数量：8
         pool = threadpool.ThreadPool(self.thread_count)
         requests1 = threadpool.makeRequests(thread_pool1, l)
         [pool.putRequest(req) for req in requests1]
@@ -276,9 +277,11 @@ class Request(object):
         print("备份测试数据中...")
         # 备份本次测试数据
         report.SaveSessions.SaveSessions().save_file()
-        print("发送邮件中...")
+
+        # print("发送邮件中...")
         # 发送邮件
-        report.SendEmail.send_email()
+        # report.SendEmail.send_email()
+
         d2 = datetime.datetime.now()
         t = d2 - d1
         print('接口回归测试完成！')

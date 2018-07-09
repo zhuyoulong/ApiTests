@@ -281,6 +281,21 @@ class Handlers
 			oSession.responseCode = 304;
 			oSession["ui-backcolor"] = "Lavender";
 		}
+
+		//过滤无关请求，只关注特定请求
+		if (oSession.fullUrl.Contains("admin.pupuvip.com"))
+		{
+			var fso;
+			var file;
+			fso = new ActiveXObject("Scripting.FileSystemObject");
+			//文件保存路径，可自定义
+			file = fso.OpenTextFile("D:\\Fiddler Sessions\\Sessions.txt",8 ,true, true);
+			file.writeLine("Request url: " + oSession.url);
+			file.writeLine("Request header:" + "\n" + oSession.oRequest.headers);
+			file.writeLine("Request body: " + oSession.GetRequestBodyAsString());
+			file.writeLine("\n");
+			file.close();
+		}
 	}
 
 	// This function is called immediately after a set of request headers has
@@ -373,6 +388,21 @@ class Handlers
 				file.close();
 				oSession["ui-color"] = "blue"
 			}
+		}
+
+		//过滤无关请求，只关注特定请求
+		if (oSession.fullUrl.Contains("admin.pupuvip.com"))
+		{
+			oSession.utilDecodeResponse();//消除保存的请求可能存在乱码的情况
+			var fso2;
+			var file2;
+			fso2 = new ActiveXObject("Scripting.FileSystemObject");
+			//文件保存路径，可自定义
+			file2 = fso2.OpenTextFile("D:\\Fiddler Sessions\\Sessions.txt",8 ,true, true);
+			file2.writeLine("Response code: " + oSession.responseCode);
+			file2.writeLine("Response body: " + oSession.GetResponseBodyAsString());
+			file2.writeLine("\n");
+			file2.close();
 		}
 	}
 

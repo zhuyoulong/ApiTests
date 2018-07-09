@@ -55,18 +55,23 @@ class ReadSessions(object):
             if not os.path.exists(file_path):
                 raise utils.Errors.ApiNotRecorded('%s接口未录制，接口回归测试退出' % (s, ))
 
-        for s in utils.Consts.DELETE_DICT.keys():
-            file_path = '%s\\%s.txt' % (self.sessions_path, s)
-            if not os.path.exists(file_path):
-                raise utils.Errors.ApiNotRecorded('%s接口未录制，接口回归测试退出' % (s, ))
+        # for s in utils.Consts.DELETE_DICT.keys():
+        #     file_path = '%s\\%s.txt' % (self.sessions_path, s)
+        #     if not os.path.exists(file_path):
+        #         raise utils.Errors.ApiNotRecorded('%s接口未录制，接口回归测试退出' % (s, ))
 
     def __ignore_sessions(self):
         """
         忽略删除接口，用于延迟执行
         :return:
         """
+        #删除特殊文件
         self.__remove_special_files()
+
+        #获取sessions文件列表
         files = list(utils.FileUtil.get_file_list(self.sessions_path))
+
+        #忽略删除接口
         for s in utils.Consts.DELETE_DICT.keys():
             file_path = '%s.txt' % (s, )
             if file_path in files:
@@ -97,14 +102,24 @@ class ReadSessions(object):
 
         for i1 in l1:
             if not i1.startswith("\n"):
-                if i1.startswith("Request url: "):
+                # if i1.startswith("Request url: "):
+                if"Request url: " in i1:
                     single_session.append(i1.split("Request url: ")[-1].replace("\n", ""))
-                if i1.startswith("Request body: "):
+                if"Request body: " in i1:
                     single_session.append(i1.split("Request body: ")[-1].replace("\n", ""))
-                if i1.startswith("Response body: "):
+                if"Response body: " in i1:
                     json_body = i1.split("Response body: ")[-1].replace("\n", "")
                     single_session.append(utils.HandleJson.HandleJson().decode_json(json_body))
                     single_session.append(json_body)
+
+                # if i1.startswith("Request url: "):
+                #     single_session.append(i1.split("Request url: ")[-1].replace("\n", ""))
+                # if i1.startswith("Request body: "):
+                #     single_session.append(i1.split("Request body: ")[-1].replace("\n", ""))
+                # if i1.startswith("Response body: "):
+                #     json_body = i1.split("Response body: ")[-1].replace("\n", "")
+                #     single_session.append(utils.HandleJson.HandleJson().decode_json(json_body))
+                #     single_session.append(json_body)
             if i1.startswith("Session end"):
                 if len(single_session) == 4 and utils.Consts.HOST in single_session[0]:
                     if utils.Consts.DUPLICATE_SWITCH:
